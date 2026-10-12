@@ -30,16 +30,14 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install Android SDK packages
+      - name: Accept licenses and install Android SDK packages
         run: |
-          yes | sdkmanager --licenses > /dev/null || true
-          sdkmanager --install \
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKMANAGER" --licenses > /dev/null || true
+          "$SDKMANAGER" --install \
             "platform-tools" \
             "platforms;android-35" \
-            "build-tools;35.0.0"
+            "build-tools;35.0.0" > /dev/null
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -50,11 +48,9 @@ jobs:
         run: |
           if [ ! -d "$APP_DIR" ]; then
             echo "::error::Android project folder not found: $APP_DIR"
-            echo "Top-level folders in repo:"
             ls -la
             exit 1
           fi
-          echo "===== ANDROID PROJECT FILES ====="
           find "$APP_DIR" -maxdepth 4 -type f -not -path "*/.git/*" | sort
 
       - name: Build debug APK
