@@ -1,4 +1,23 @@
-- name: Checkout repository
+name: Build OpenJarvis Android APK
+
+on:
+workflow_dispatch:
+push:
+branches:
+- main
+paths:
+- "OpenJarvis-main/OpenJarvis-main/android-app/**"
+- ".github/workflows/main.yml"
+
+permissions:
+contents: read
+
+jobs:
+build:
+runs-on: ubuntu-latest
+
+steps:
+  - name: Checkout repository
     uses: actions/checkout@v4
 
   - name: Set up Java
@@ -27,8 +46,6 @@
       echo "===== REPOSITORY ROOT ====="
       pwd
       ls -la
-      echo "===== SETTINGS FILES ====="
-      find . -name settings.gradle.kts
       echo "===== ANDROID PROJECT FILES ====="
       find OpenJarvis-main/OpenJarvis-main/android-app -maxdepth 5 -type f | sort
 
@@ -47,15 +64,12 @@
   - name: Diagnose Gradle tasks
     working-directory: OpenJarvis-main/OpenJarvis-main/android-app
     run: |
-      echo "===== GRADLE PROJECTS ====="
       gradle --no-daemon projects
-      echo "===== APP TASKS ====="
       gradle --no-daemon :app:tasks --all
 
   - name: Build debug APK
     working-directory: OpenJarvis-main/OpenJarvis-main/android-app
-    run: |
-      gradle --no-daemon :app:assembleDebug
+    run: gradle --no-daemon :app:assembleDebug
 
   - name: Upload APK
     uses: actions/upload-artifact@v4
