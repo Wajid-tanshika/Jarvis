@@ -1,67 +1,85 @@
 name: Build OpenJarvis Android APK
 
 on:
-  workflow_dispatch:
+workflow_dispatch:
 
-  push:
-    branches:
-      - main
-    paths:
-      - "OpenJarvis-main/OpenJarvis-main/android-app/**"
-      - ".github/workflows/android-build.yml"
+push:
+branches:
+- main
+paths:
+- "OpenJarvis-main/OpenJarvis-main/android-app/**"
+- ".github/workflows/android-build.yml"
+
+permissions:
+contents: read
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+build:
+runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+steps:
+  - name: Checkout repository
+    uses: actions/checkout@v4
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
+  - name: Set up Java
+    uses: actions/setup-java@v4
+    with:
+      distribution: temurin
+      java-version: "17"
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v4
-        with:
-          accept-android-sdk-licenses: true
+  - name: Set up Android SDK
+    uses: android-actions/setup-android@v4
 
-      - name: Install Android SDK packages
-        run: |
-          sdkmanager --install \
-            "platform-tools" \
-            "platforms;android-35" \
-            "build-tools;35.0.0"
+  - name: Install Android SDK packages
+    run: |
+      sdkmanager --install \
+        "platform-tools" \
+        "platforms;android-35" \
+        "build-tools;35.0.0"
 
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: "8.11.1"
+  - name: Set up Gradle
+    uses: gradle/actions/setup-gradle@v4
+    with:
+      gradle-version: "8.11.1"
 
-      - name: Check project files
-        run: |
-          pwd
-          ls -la
-          find . -name settings.gradle.kts
+  - name: Check project files
+    run: |
+      echo "===== REPOSITORY ROOT ====="
+      pwd
+      ls -la
+      echo "===== SETTINGS FILES ====="
+      find . -name settings.gradle.kts
+      echo "===== ANDROID PROJECT FILES ====="
+      find OpenJarvis-main/OpenJarvis-main/android-app -maxdepth 5 -type f | sort
 
-      
-      - name: Diagnose and Build Android APK
-        working-directory: OpenJarvis-main/OpenJarvis-main/android-app
-        run: |
-          echo "===== Gradle projects ====="
-          gradle --no-daemon projects
-          echo "===== App tasks ====="
-          gradle --no-daemon :app:tasks --all
-          echo "===== Build APK ====="
-          gradle --no-daemon :app:assembleDebug
-          
+  - name: Inspect Android Gradle files
+    working-directory: OpenJarvis-main/OpenJarvis-main/android-app
+    run: |
+      echo "===== SETTINGS ====="
+      cat settings.gradle.kts
+      echo "===== ROOT BUILD ====="
+      cat build.gradle.kts
+      echo "===== APP BUILD ====="
+      cat app/build.gradle.kts
+      echo "===== APP SOURCE FILES ====="
+      find app/src -maxdepth 8 -type f | sort
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: OpenJarvis-debug-APK
-          path: OpenJarvis-main/OpenJarvis-main/android-app/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
+  - name: Diagnose Gradle tasks
+    working-directory: OpenJarvis-main/OpenJarvis-main/android-app
+    run: |
+      echo "===== GRADLE PROJECTS ====="
+      gradle --no-daemon projects
+      echo "===== APP TASKS ====="
+      gradle --no-daemon :app:tasks --all
+
+  - name: Build debug APK
+    working-directory: OpenJarvis-main/OpenJarvis-main/android-app
+    run: |
+      gradle --no-daemon :app:assembleDebug
+
+  - name: Upload APK
+    uses: actions/upload-artifact@v4
+    with:
+      name: OpenJarvis-debug-APK
+      path: OpenJarvis-main/OpenJarvis-main/android-app/app/build/outputs/apk/debug/app-debug.apk
+      if-no-files-found: error
