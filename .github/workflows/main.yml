@@ -2,7 +2,10 @@ name: Build OpenJarvis Android APK
 
 on:
   workflow_dispatch:
+
   push:
+    branches:
+      - main
     paths:
       - "OpenJarvis-main/android-app/**"
       - ".github/workflows/android-build.yml"
