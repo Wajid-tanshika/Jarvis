@@ -41,9 +41,16 @@ jobs:
         with:
           gradle-version: "8.11.1"
 
+            - name: Check project files
+        run: |
+          pwd
+          ls -la
+          find . -name settings.gradle.kts
+
       - name: Build debug APK
-        working-directory: OpenJarvis-main/android-app
-        run: gradle --no-daemon assembleDebug
+        run: |
+          cd OpenJarvis-main/android-app
+          gradle --no-daemon assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
