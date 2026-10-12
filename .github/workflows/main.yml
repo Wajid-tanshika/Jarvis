@@ -1,24 +1,4 @@
-name: Build OpenJarvis Android APK
-
-on:
-workflow_dispatch:
-
-push:
-branches:
-- main
-paths:
-- "OpenJarvis-main/OpenJarvis-main/android-app/**"
-- ".github/workflows/android-build.yml"
-
-permissions:
-contents: read
-
-jobs:
-build:
-runs-on: ubuntu-latest
-
-steps:
-  - name: Checkout repository
+- name: Checkout repository
     uses: actions/checkout@v4
 
   - name: Set up Java
