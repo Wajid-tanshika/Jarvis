@@ -47,9 +47,17 @@ jobs:
           ls -la
           find . -name settings.gradle.kts
 
-      - name: Build debug APK
+      
+      - name: Diagnose and Build Android APK
         working-directory: OpenJarvis-main/OpenJarvis-main/android-app
-        run: gradle --no-daemon assembleDebug
+        run: |
+          echo "===== Gradle projects ====="
+          gradle --no-daemon projects
+          echo "===== App tasks ====="
+          gradle --no-daemon :app:tasks --all
+          echo "===== Build APK ====="
+          gradle --no-daemon :app:assembleDebug
+          
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
