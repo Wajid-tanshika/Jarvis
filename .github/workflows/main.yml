@@ -63,9 +63,9 @@ jobs:
             gradle --no-daemon --stacktrace :app:assembleDebug
           fi
 
-      - name: Upload APK
+            - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: OpenJarvis-debug-APK
-          path: ${{ env.APP_DIR }}/app/build/outputs/apk/debug/*.apk
+          path: ${{ env.APP_DIR }}/**/build/outputs/apk/debug/*.apk
           if-no-files-found: error
