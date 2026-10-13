@@ -51,7 +51,7 @@ jobs:
             ls -la
             exit 1
           fi
-          find "$APP_DIR" -maxdepth 4 -type f -not -path "*/.git/*" | sort
+          find "$APP_DIR" -maxdepth 6 -type f -not -path "*/.git/*" | sort
 
       - name: Build debug APK
         working-directory: ${{ env.APP_DIR }}
@@ -63,7 +63,7 @@ jobs:
             gradle --no-daemon --stacktrace :app:assembleDebug
           fi
 
-            - name: Upload APK
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: OpenJarvis-debug-APK
